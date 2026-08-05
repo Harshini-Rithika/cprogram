@@ -1,0 +1,24 @@
+int marks_summation(int* marks, int number_of_students, char gender) {
+    int sum = 0;
+    int start = (gender == 'b') ? 0 : 1;
+    
+    for (int i = start; i < number_of_students; i += 2) {
+        sum += *(marks + i);
+    }
+    
+    return sum;
+}
+```
+
+## How It Works
+
+- **Start Point**: Set the loop start index to `0` for boys (`'b'`) and `1` for girls (`'g'`).
+- **Step Size**: Increment the index by `2` to skip to the next student of the same gender.
+- **Addition**: Use pointer addition `*(marks + i)` to access each element and add it to the total sum.
+
+## Additional Resources
+
+- Read community discussions on the [LinkedIn Article for Students Marks Sum](https://www.linkedin.com/pulse/students-marks-sum-c-language-series-hacker-rank-pooja-pedgaonkar).
+- Check sample implementations in C on the [GitHub Repository Code](https://github.com/MrinmoiHossain/HackerRank/blob/master/C/Functions/Students%20Marks%20Sum.c).
+- Review community code variants via [C-Language WordPress Solutions](https://hackersolutions.wordpress.com/c-language/).
+- Find alternative student queries on [Brainly Question Discussion](https://brainly.in/question/13246237).
