@@ -1,0 +1,13 @@
+#include <stdlib.h>
+void traverse(struct TreeNode* root, int* arr, int* index) {
+    if (root == NULL) return;
+    arr[(*index)++] = root->val;
+    traverse(root->left, arr, index);
+    traverse(root->right, arr, index);
+}
+int* preorderTraversal(struct TreeNode* root, int* returnSize) {
+    int* result = (int*)malloc(100 * sizeof(int));
+    *returnSize = 0;
+    traverse(root, result, returnSize);
+    return result;
+}
