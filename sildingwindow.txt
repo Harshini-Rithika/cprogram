@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+int compare_doubles(const void *a, const void *b) {
+    double da = *(const double *)a;
+    double db = *(const double *)b;
+    return (da > db) - (da < db);
+}
+int binary_search(double *arr, int size, double val) {
+    int low = 0, high = size - 1;
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (arr[mid] == val) return mid;
+        if (arr[mid] < val) low = mid + 1;
+        else high = mid - 1;
+    }
+    return low; 
+}
+double* medianSlidingWindow(int* nums, int numsSize, int k, int* returnSize) {
+    *returnSize = numsSize - k + 1;
+    double* result = (double*)malloc((*returnSize) * sizeof(double));
+    double* window = (double*)malloc(k * sizeof(double));
+    for (int i = 0; i < k; i++) {
+        window[i] = (double)nums[i];
+    }
+    qsort(window, k, sizeof(double), compare_doubles);
+    if (k % 2 == 1) {
+        result[0] = window[k / 2];
+    } else {
+        result[0] = (window[k / 2 - 1] + window[k / 2]) / 2.0;
+    }
+    for (int i = k; i < numsSize; i++) {
+        double out_val = (double)nums[i - k];
+        double in_val = (double)nums[i];
+        int rem_idx = binary_search(window, k, out_val);
+        memmove(&window[rem_idx], &window[rem_idx + 1], (k - rem_idx - 1) * sizeof(double));
+        int ins_idx = binary_search(window, k - 1, in_val);
+        memmove(&window[ins_idx + 1], &window[ins_idx], (k - ins_idx - 1) * sizeof(double));
+        window[ins_idx] = in_val;
+        if (k % 2 == 1) {
+            result[i - k + 1] = window[k / 2];
+        } else {
+            result[i - k + 1] = (window[k / 2 - 1] + window[k / 2]) / 2.0;
+        }
+    }
+    free(window);
+    return result;
+}
