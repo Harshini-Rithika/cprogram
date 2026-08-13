@@ -1,0 +1,79 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#define INF 1e9
+#define HASH_SIZE 31 
+typedef struct HashNode {
+    int current_and;
+    int value;
+    struct HashNode* next;
+} HashNode;
+typedef struct {
+    HashNode* buckets[HASH_SIZE];
+} MemoState;
+int getHash(int key) {
+    unsigned int ukey = (unsigned int)key;
+    return ukey % HASH_SIZE;
+}
+int lookup(MemoState* state, int current_and) {
+    int index = getHash(current_and);
+    HashNode* curr = state->buckets[index];
+    while (curr != NULL) {
+        if (curr->current_and == current_and) {
+            return curr->value;
+        }
+        curr = curr->next;
+    }
+    return -2; 
+}
+void insert(MemoState* state, int current_and, int value) {
+    int index = getHash(current_and);
+    HashNode* newNode = (HashNode*)malloc(sizeof(HashNode));
+    newNode->current_and = current_and;
+    newNode->value = value;
+    newNode->next = state->buckets[index];
+    state->buckets[index] = newNode;
+}
+int dfs(int i, int j, int current_and, int* nums, int numsSize, int* andValues, int andValuesSize, MemoState* memo) {
+    if (i == numsSize && j == andValuesSize) return 0;
+    if (i == numsSize || j == andValuesSize) return INF;
+    current_and &= nums[i];
+    if ((current_and & andValues[j]) != andValues[j]) return INF;
+    int stateIndex = i * (andValuesSize + 1) + j;
+    int cachedVal = lookup(&memo[stateIndex], current_and);
+    if (cachedVal != -2) return cachedVal;
+    int result = INF;
+    if (current_and == andValues[j]) {
+        int close_subarray = dfs(i + 1, j + 1, -1, nums, numsSize, andValues, andValuesSize, memo);
+        if (close_subarray != INF) {
+            int current_cost = nums[i] + close_subarray;
+            if (current_cost < result) {
+                result = current_cost;
+            }
+        }
+    }
+    int extend_subarray = dfs(i + 1, j, current_and, nums, numsSize, andValues, andValuesSize, memo);
+    if (extend_subarray < result) {
+        result = extend_subarray;
+    }
+    insert(&memo[stateIndex], current_and, result);
+    return result;
+}
+int minimumValueSum(int* nums, int numsSize, int* andValues, int andValuesSize) {
+    int totalStates = numsSize * (andValuesSize + 1);
+    MemoState* memo = (MemoState*)calloc(totalStates, sizeof(MemoState));
+    int ans = dfs(0, 0, -1, nums, numsSize, andValues, andValuesSize, memo);
+    for (int k = 0; k < totalStates; k++) {
+        for (int b = 0; b < HASH_SIZE; b++) {
+            HashNode* curr = memo[k].buckets[b];
+            while (curr != NULL) {
+                HashNode* temp = curr;
+                curr = curr->next;
+                free(temp);
+            }
+        }
+    }
+    free(memo);
+
+    return ans >= INF ? -1 : ans;
+}

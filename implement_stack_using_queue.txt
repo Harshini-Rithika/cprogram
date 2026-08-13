@@ -1,0 +1,84 @@
+#include <stdbool.h>
+#include <stdlib.h>
+
+// Queue Implementation
+typedef struct {
+    int data[205]; 
+    int front;
+    int rear;
+} Queue;
+
+Queue* createQueue() {
+    Queue* q = (Queue*)malloc(sizeof(Queue));
+    q->front = 0;
+    q->rear = 0;
+    return q;
+}
+
+void enqueue(Queue* q, int val) {
+    q->data[q->rear++] = val;
+}
+
+int dequeue(Queue* q) {
+    return q->data[q->front++];
+}
+
+int peek(Queue* q) {
+    return q->data[q->front];
+}
+
+bool isQueueEmpty(Queue* q) {
+    return q->front == q->rear;
+}
+
+void freeQueue(Queue* q) {
+    free(q);
+}
+
+
+typedef struct {
+    Queue* queue1;
+    Queue* queue2;
+} MyStack;
+
+MyStack* myStackCreate() {
+    MyStack* stack = (MyStack*)malloc(sizeof(MyStack));
+    stack->queue1 = createQueue();
+    stack->queue2 = createQueue();
+    return stack;
+}
+
+void myStackPush(MyStack* obj, int x) {
+    
+    enqueue(obj->queue2, x);
+    
+    
+    while (!isQueueEmpty(obj->queue1)) {
+        enqueue(obj->queue2, dequeue(obj->queue1));
+    }
+    
+    
+    Queue* temp = obj->queue1;
+    obj->queue1 = obj->queue2;
+    obj->queue2 = temp;
+    obj->queue2->front = 0;
+    obj->queue2->rear = 0;
+}
+
+int myStackPop(MyStack* obj) {
+    return dequeue(obj->queue1);
+}
+
+int myStackTop(MyStack* obj) {
+    return peek(obj->queue1);
+}
+
+bool myStackEmpty(MyStack* obj) {
+    return isQueueEmpty(obj->queue1);
+}
+
+void myStackFree(MyStack* obj) {
+    freeQueue(obj->queue1);
+    freeQueue(obj->queue2);
+    free(obj);
+}
