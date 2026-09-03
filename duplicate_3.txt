@@ -1,0 +1,94 @@
+#include <stdbool.h>
+#include <stdlib.h>
+typedef struct HashNode {
+    long key;
+    long value;
+    struct HashNode* next;
+} HashNode;
+#define HASH_SIZE 10007
+long getBucketId(long num, long width) {
+    return num < 0 ? (num + 1) / width - 1 : num / width;
+}
+int getHashIndex(long key) {
+    int idx = key % HASH_SIZE;
+    return idx < 0 ? idx + HASH_SIZE : idx;
+}
+void insertHash(HashNode** buckets, long key, long value) {
+    int idx = getHashIndex(key);
+    HashNode* node = (HashNode*)malloc(sizeof(HashNode));
+    node->key = key;
+    node->value = value;
+    node->next = buckets[idx];
+    buckets[idx] = node;
+}
+bool searchHash(HashNode** buckets, long key, long* resValue) {
+    int idx = getHashIndex(key);
+    HashNode* curr = buckets[idx];
+    while (curr) {
+        if (curr->key == key) {
+            *resValue = curr->value;
+            return true;
+        }
+        curr = curr->next;
+    }
+    return false;
+}
+void deleteHash(HashNode** buckets, long key) {
+    int idx = getHashIndex(key);
+    HashNode* curr = buckets[idx];
+    HashNode* prev = NULL;
+    while (curr) {
+        if (curr->key == key) {
+            if (prev == NULL) {
+                buckets[idx] = curr->next;
+            } else {
+                prev->next = curr->next;
+            }
+            free(curr);
+            return;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+}
+void freeAll(HashNode** buckets) {
+    for (int i = 0; i < HASH_SIZE; i++) {
+        HashNode* curr = buckets[i];
+        while (curr) {
+            HashNode* temp = curr;
+            curr = curr->next;
+            free(temp);
+        }
+        buckets[i] = NULL;
+    }
+}
+bool containsNearbyAlmostDuplicate(int* nums, int numsSize, int indexDiff, int valueDiff) {
+    if (numsSize < 2 || indexDiff < 1 || valueDiff < 0) return false;
+    HashNode* buckets[HASH_SIZE] = {NULL};
+    long width = (long)valueDiff + 1;
+    for (int i = 0; i < numsSize; i++) {
+        long num = nums[i];
+        long bucketId = getBucketId(num, width);
+        long foundValue;
+        if (searchHash(buckets, bucketId, &foundValue)) {
+            freeAll(buckets);
+            return true;
+        }
+        if (searchHash(buckets, bucketId - 1, &foundValue) && labs(num - foundValue) <= valueDiff) {
+            freeAll(buckets);
+            return true;
+        }
+        if (searchHash(buckets, bucketId + 1, &foundValue) && labs(num - foundValue) <= valueDiff) {
+            freeAll(buckets);
+            return true;
+        }
+        insertHash(buckets, bucketId, num);
+        if (i >= indexDiff) {
+            long oldBucketId = getBucketId(nums[i - indexDiff], width);
+            deleteHash(buckets, oldBucketId);
+        }
+    }
+
+    freeAll(buckets);
+    return false;
+}
