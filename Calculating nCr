@@ -1,0 +1,19 @@
+#include<stdio.h>
+int main()
+{
+   int i,n,r,prd1=1,prd2=1,ncr;
+   printf("enter the value of r:");
+   scanf("%d",&r);
+   for(i=1;i<=r;i++)
+   {
+      prd1=prd1*i;
+   }
+   printf("enter the value of n");
+   scanf("%d",&n);
+   for(i=1;i<=n-r;i++)
+   {
+      prd2=prd2*i;
+   }
+   ncr=prd1/prd2;
+   printf("the value is %d",ncr);
+}
