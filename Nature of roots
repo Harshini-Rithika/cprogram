@@ -1,0 +1,20 @@
+#include<stdio.h>
+#include<math.h>
+int main()
+{
+   int a,b,c,t;
+   float root1,root2,x;
+   printf("enter values of a,b,c:");
+   scanf("%d %d %d",&a,&b,&c);
+   t=((pow(b,2))-(4*a*c));
+   x=sqrt(t);
+   root1=(-b+x)/(2*a);
+   root2=(-b-x)/(2*a);
+   printf("root1=%f and root2=%f",root1,root2);
+   if(t>0)
+      printf("the nature of root is real and unequal,the number is %d",t);
+   else if(t<0)
+      printf("the nature of roots has imaginary roots,the number is %d",t);
+   else
+      printf("the nature of root has real and equal roots,the number is %d",t);
+}
