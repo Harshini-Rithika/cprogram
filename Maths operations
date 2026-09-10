@@ -1,0 +1,35 @@
+#include<stdio.h>
+int main()
+{
+   int a,b,c;
+   char op;
+   printf("enter the operator:");
+      scanf("%c ",&op);
+      printf("enter the value of a and b:");
+            scanf("%d %d",&a,&b);
+       switch(op)
+   {
+   case '+':
+      c=a+b;
+      printf("addithion answer is %d",c);
+      break;
+   case '-':
+      c=a-b;
+      printf("subraction answer is %d",c);
+break;
+   case '*':
+c=a*b;
+printf("multiplication answer is %d",c);
+break;
+   case '/':
+if(b==0)
+   printf("divided by 0");
+else
+   c=a/b;
+printf("division answer is %d",c);
+break;
+   default:
+printf("unknown");
+break;
+}
+}
