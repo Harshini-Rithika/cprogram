@@ -1,0 +1,29 @@
+#include<stdio.h>
+int main()
+{
+   int m1,m2,m3,m4,m5,tot,avg;
+  printf("english:");
+  scanf("%d",&m1);
+  printf("maths:");
+  scanf("%d",&m2);
+  printf("physics:");
+  scanf("%d",&m3);
+  printf("chemistry:");
+  scanf("%d",&m4);
+  printf("biology:");
+  scanf("%d",&m5);
+  tot=m1+m2+m3+m4+m5;
+  avg=tot/5;
+  printf("\n\tthe total is %d",tot);
+  printf("\n\tthe average is %d",avg);
+  if(avg>90)
+     printf("\n\tgrade A");
+  else if((avg>70)&&(avg<89))
+     printf("\n\tgrade B");
+  else if((avg>50)&&(avg<69))
+     printf("\n\tgrade C");
+  else if((avg>35)&&(avg<49))
+     printf("\n\tgrade D");
+  else
+     printf("\n\tgrade E");
+}
