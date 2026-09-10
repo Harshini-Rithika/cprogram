@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <stdlib.h>
+int compare(const void* a, const void* b) {
+    return (*(int*)a - *(int*)b);
+}
+void backtrack(int* candidates, int candidatesSize, int target, int index, 
+               int* currentCombination, int currentSize, 
+               int*** results, int* resultCount, int** columnSizes, int* capacity) {
+    if (target == 0) {
+        if (*resultCount >= *capacity) {
+            *capacity *= 2;
+            *results = (int**)realloc(*results, (*capacity) * sizeof(int*));
+            *columnSizes = (int*)realloc(*columnSizes, (*capacity) * sizeof(int));
+        }
+        (*results)[*resultCount] = (int*)malloc(currentSize * sizeof(int));
+        for (int i = 0; i < currentSize; i++) {
+            (*results)[*resultCount][i] = currentCombination[i];
+        }
+        (*columnSizes)[*resultCount] = currentSize;
+        (*resultCount)++;
+        return;
+    }
+    for (int i = index; i < candidatesSize; i++) {
+        if (candidates[i] > target) {
+            break;
+        }
+        currentCombination[currentSize] = candidates[i];
+        backtrack(candidates, candidatesSize, target - candidates[i], i, 
+                  currentCombination, currentSize + 1, 
+                  results, resultCount, columnSizes, capacity);
+    }
+}
+int** combinationSum(int* candidates, int candidatesSize, int target, int* returnSize, int** returnColumnSizes) {
+    qsort(candidates, candidatesSize, sizeof(int), compare);
+
+    int initialCapacity = 150;
+    int** results = (int**)malloc(initialCapacity * sizeof(int*));
+    *returnColumnSizes = (int*)malloc(initialCapacity * sizeof(int));
+    int resultCount = 0;
+    int capacity = initialCapacity;
+    int* currentCombination = (int*)malloc(40 * sizeof(int)); 
+    backtrack(candidates, candidatesSize, target, 0, 
+              currentCombination, 0, 
+              &results, &resultCount, returnColumnSizes, &capacity);
+    free(currentCombination);
+    *returnSize = resultCount;
+    return results;
+}
