@@ -1,0 +1,33 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+struct stu_dt
+{
+   char item_id[10];
+   char name[50];
+   int avail;
+   int price;
+}*p;
+int main()
+{
+   int ch,n,i;
+   printf("enter the number of items");
+   scanf("%d",&n);
+   p=(struct stu_dt*)malloc(n*sizeof(struct stu_dt));
+   for(i=0;i<n-1;i++)
+   {
+      printf("enter the item id:");
+      scanf("%s",p[i].item_id);
+      printf("enter the name:");
+      scanf("%s",p[i].name);
+      printf("enter the stock quantity");
+      scanf("%d",&p[i].avail);
+      printf("enter the prize:");
+      scanf("%d",&p[i].price);
+   }
+   for(i=0;i<n-1;i++)
+   {
+      printf("%s\t%s\t%d\t%d\n",p[i].item_id,p[i].name,p[i].avail,p[i].price);
+   }
+   free(p);
+}
