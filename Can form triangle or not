@@ -1,0 +1,13 @@
+[24bec011@mepcolinux expt2]$cat prog6.c
+#include<stdio.h>
+int main()
+{
+   int a,b,c;
+   c=15;
+   printf("enter the value a and b:");
+   scanf("%d %d",&a,&b);
+   if(a+b>c)
+      printf("the given sides can form a triangle");
+   else
+      printf("the given sides can not form a triangle");
+}
