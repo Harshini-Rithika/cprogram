@@ -1,0 +1,64 @@
+#define MAX_VAL(a, b) ((a) > (b) ? (a) : (b))
+#define MIN_VAL(a, b) ((a) < (b) ? (a) : (b))
+
+long long maxProduct(char* s) {
+    int n = strlen(s);
+    if (n < 2) return 0;
+
+    int* p = (int*)calloc(n, sizeof(int));
+    int c = 0, r = 0;
+
+    for (int i = 0; i < n; i++) {
+        int mirror = 2 * c - i;
+        if (i < r) {
+            p[i] = MIN_VAL(r - i, p[mirror]);
+        }
+        while (i - p[i] - 1 >= 0 && i + p[i] + 1 < n && s[i - p[i] - 1] == s[i + p[i] + 1]) {
+            p[i]++;
+        }
+        if (i + p[i] > r) {
+            c = i;
+            r = i + p[i];
+        }
+    }
+
+    int* left_max = (int*)calloc(n, sizeof(int));
+    int* right_max = (int*)calloc(n, sizeof(int));
+
+    int idx = 0;
+    for (int i = 0; i < n; i++) {
+        while (idx < n && idx + p[idx] < i) {
+            idx++;
+        }
+        left_max[i] = (i - idx) * 2 + 1;
+        if (i > 0) {
+            left_max[i] = MAX_VAL(left_max[i], left_max[i - 1]);
+        }
+    }
+
+    idx = n - 1;
+    for (int i = n - 1; i >= 0; i--) {
+        while (idx >= 0 && idx - p[idx] > i) {
+            idx--;
+        }
+        right_max[i] = (idx - i) * 2 + 1;
+        if (i < n - 1) {
+            right_max[i] = MAX_VAL(right_max[i], right_max[i + 1]);
+        }
+    }
+
+    long long max_prod = 0;
+    for (int i = 0; i < n - 1; i++) {
+        long long current_prod = (long long)left_max[i] * right_max[i + 1];
+        if (current_prod > max_prod) {
+            max_prod = current_prod;
+        }
+    }
+
+    free(p);
+    free(left_max);
+    free(right_max);
+
+    return max_prod;
+}
+
