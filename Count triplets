@@ -1,0 +1,202 @@
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <ctype.h>
+
+char* readline();
+char* ltrim(char*);
+char* rtrim(char*);
+char** split_string(char*);
+int parse_int(char*);
+long parse_long(char*);
+
+#define HASH_SIZE 200003 
+
+typedef struct {
+    long key;
+    long count;
+} HashEntry;
+
+typedef struct {
+    HashEntry* table;
+} HashMap;
+
+HashMap* createMap() {
+    HashMap* map = malloc(sizeof(HashMap));
+    map->table = calloc(HASH_SIZE, sizeof(HashEntry));
+    return map;
+}
+
+void freeMap(HashMap* map) {
+    free(map->table);
+    free(map);
+}
+
+unsigned int hash(long key) {
+    unsigned long k = (unsigned long)key;
+    k ^= k >> 33;
+    k *= 0xff51afd7ed558ccdEC;
+    k ^= k >> 33;
+    k *= 0xc4ceb9fe1a85ec53EC;
+    k ^= k >> 33;
+    return k % HASH_SIZE;
+}
+
+void insert(HashMap* map, long key, long val) {
+    unsigned int slot = hash(key);
+    while (map->table[slot].count != 0 && map->table[slot].key != key) {
+        slot = (slot + 1) % HASH_SIZE;
+    }
+    map->table[slot].key = key;
+    map->table[slot].count += val;
+}
+
+long get(HashMap* map, long key) {
+    unsigned int slot = hash(key);
+    while (map->table[slot].count != 0) {
+        if (map->table[slot].key == key) {
+            return map->table[slot].count;
+        }
+        slot = (slot + 1) % HASH_SIZE;
+    }
+    return 0;
+}
+
+/*
+ * Complete the 'countTriplets' function below.
+ * The function is expected to return a LONG_INTEGER.
+ */
+long countTriplets(int arr_count, long* arr, long r) {
+    long total_triplets = 0;
+
+    HashMap* left_map = createMap();
+    HashMap* right_map = createMap();
+
+    for (int i = 0; i < arr_count; i++) {
+        insert(right_map, arr[i], 1);
+    }
+
+    for (int i = 0; i < arr_count; i++) {
+        long mid = arr[i];
+        long left_count = 0;
+        long right_count = 0;
+
+        insert(right_map, mid, -1);
+
+        if (mid % r == 0) {
+            left_count = get(left_map, mid / r);
+        }
+
+        right_count = get(right_map, mid * r);
+
+        total_triplets += left_count * right_count;
+
+        insert(left_map, mid, 1);
+    }
+
+    freeMap(left_map);
+    freeMap(right_map);
+
+    return total_triplets;
+}
+
+int main()
+{
+    FILE* fptr = fopen(getenv("OUTPUT_PATH"), "w");
+    if (fptr == NULL) {
+        fptr = stdout;
+    }
+
+    char** first_multiple_input = split_string(rtrim(readline()));
+    int n = parse_int(*(first_multiple_input + 0));
+    long r = parse_long(*(first_multiple_input + 1));
+
+    char** arr_temp = split_string(rtrim(readline()));
+    long* arr = malloc(n * sizeof(long));
+
+    for (int i = 0; i < n; i++) {
+        long arr_item = parse_long(*(arr_temp + i));
+        *(arr + i) = arr_item;
+    }
+
+    long ans = countTriplets(n, arr, r);
+
+    fprintf(fptr, "%ld\n", ans);
+
+    if (fptr != stdout) {
+        fclose(fptr);
+    }
+
+    free(arr);
+    return 0;
+}
+
+char* readline() {
+    size_t alloc_length = 1024;
+    size_t data_length = 0;
+    char* data = malloc(alloc_length);
+
+    while (true) {
+        char* cursor = data + data_length;
+        char* line = fgets(cursor, alloc_length - data_length, stdin);
+        if (!line) break;
+
+        data_length += strlen(cursor);
+        if (data_length < alloc_length - 1 || data[data_length - 1] == '\n') break;
+
+        alloc_length <<= 1;
+        data = realloc(data, alloc_length);
+        if (!data) {
+            data = NULL;
+            break;
+        }
+    }
+
+    if (data && data_length > 0 && data[data_length - 1] == '\n') {
+        data[data_length - 1] = '\0';
+        data = realloc(data, data_length);
+    } else if (data) {
+        data = realloc(data, data_length + 1);
+        if (data) data[data_length] = '\0';
+    }
+    return data;
+}
+
+char* rtrim(char* str) {
+    if (!str || !*str) return str;
+    char* end = str + strlen(str) - 1;
+    while (end >= str && isspace((unsigned char)*end)) end--;
+    *(end + 1) = '\0';
+    return str;
+}
+
+char** split_string(char* str) {
+    char** splits = NULL;
+    char* token = strtok(str, " ");
+    int spaces = 0;
+
+    while (token) {
+        splits = realloc(splits, sizeof(char*) * ++spaces);
+        if (!splits) return splits;
+        splits[spaces - 1] = token;
+        token = strtok(NULL, " ");
+    }
+    return splits;
+}
+
+int parse_int(char* str) {
+    char* endptr;
+    int value = strtol(str, &endptr, 10);
+    if (endptr == str || *endptr != '\0') exit(EXIT_FAILURE);
+    return value;
+}
+
+long parse_long(char* str) {
+    char* endptr;
+    long value = strtol(str, &endptr, 10);
+    if (endptr == str || *endptr != '\0') exit(EXIT_FAILURE);
+    return value;
+}
