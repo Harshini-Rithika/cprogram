@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char* shortestPalindrome(char* s) {
+    int n = strlen(s);
+    if (n == 0) {
+        char* res = malloc(1);
+        res[0] = '\0';
+        return res;
+    }
+
+    char* rev = malloc((n + 1) * sizeof(char));
+    for (int i = 0; i < n; i++) {
+        rev[i] = s[n - 1 - i];
+    }
+    rev[n] = '\0';
+
+    int temp_len = 2 * n + 1;
+    char* temp = malloc((temp_len + 1) * sizeof(char));
+    strcpy(temp, s);
+    temp[n] = '#';
+    strcpy(temp + n + 1, rev);
+
+    int* lps = calloc(temp_len, sizeof(int));
+    for (int i = 1; i < temp_len; i++) {
+        int j = lps[i - 1];
+        while (j > 0 && temp[i] != temp[j]) {
+            j = lps[j - 1];
+        }
+        if (temp[i] == temp[j]) {
+            j++;
+        }
+        lps[i] = j;
+    }
+
+    int longest_pal_len = lps[temp_len - 1];
+    int add_len = n - longest_pal_len;
+
+    char* result = malloc((add_len + n + 1) * sizeof(char));
+    strncpy(result, rev, add_len);
+    strcpy(result + add_len, s);
+
+    free(rev);
+    free(temp);
+    free(lps);
+
+    return result;
+}
