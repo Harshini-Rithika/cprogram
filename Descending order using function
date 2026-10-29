@@ -1,0 +1,16 @@
+int num(int x)
+  3 {
+  4    if(x<1)
+  5       return 1;
+  6    else{
+  7       printf("%d",x);
+  8       return num(x-1);
+  9    }
+ 10 }
+ 11 void main(){
+ 12    int a;
+ 13    printf("Enter value");
+ 14    scanf("%d",&a);
+ 15    printf("%d",a);
+ 16    num(a);
+ 17 }
